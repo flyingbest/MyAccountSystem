@@ -7,6 +7,8 @@ using namespace std;
 #define FIN_LEN 20
 
 enum { OPEN=1, DEPOSIT, WITHDRAW, DISPLAY, EXIT };
+enum { LEVEL_A=5, LEVEL_B=3, LEVEL_C=2 };
+enum { NORMAL=1, CREDIT };
 
 class Account{
 private:
@@ -21,8 +23,8 @@ public:
 
 	char* GetAccId() const;
 	char* GetAccHolder() const;
-	char* GetFin_name() const;
-	void Deposit(int money);
+	char* GetFinName() const;
+	virtual void Deposit(int money);
 	int Withdraw(int money);
 	void ShowCurInfo() const;
 	~Account();
@@ -50,7 +52,7 @@ char* Account::GetAccId() const{
 char* Account::GetAccHolder() const{
 	return acc_holder;
 }
-char* Account::GetFin_name() const{
+char* Account::GetFinName() const{
 	return fin_ins_name;
 }
 void Account::Deposit(int money){
@@ -76,6 +78,34 @@ Account::~Account(){
 	delete []fin_ins_name;
 }
 
+class NormalAccount : public Account{
+private:
+	int interRate;
+
+public:
+	NormalAccount(int money, char *id, char *name, char *fin_name, int rate) : Account(money, id, name, fin_name), interRate(rate){
+
+	}
+	virtual void Deposit(int money){
+		Account::Deposit(money);
+		Account::Deposit(money*(interRate/100.0));
+	}
+};
+
+class HighCreditAccount : public NormalAccount{
+private:
+	int specialRate;
+
+public:
+	HighCreditAccount(int money, char *id, char *name, char *fin_name, int rate, int special) : NormalAccount(money, id, name, fin_name, rate), specialRate(special){
+
+	}
+	virtual void Deposit(int money){
+		NormalAccount::Deposit(money);
+		Account::Deposit(money*(specialRate/100.0));
+	}
+};
+
 class AccountControler{
 private:
 	Account * AccArr[100];
@@ -89,6 +119,10 @@ public:
 	void WithdrawMoney();
 	void DisplayAccInfo() const;
 	~AccountControler();
+
+protected:
+	void OpenNormalAccount();
+	void OpenCreditAccount();
 };
 
 AccountControler::AccountControler() : ArrNum(0){
@@ -108,13 +142,33 @@ void AccountControler::DisplayMenu() const{
 }
 
 void AccountControler::OpenAccount(){
+	int sel;
+
+	cout << "+----------------------------------+" << endl;
+	cout << "|       Select Account Type        |" << endl;
+	cout << "+----------------------------------+" << endl;
+	cout << "|  1. Normal Account.              |" << endl;
+	cout << "|  2. Credit Account.              |" << endl;
+	cout << "+----------------------------------+" << endl;
+	cout << "Select type(only number) : ";
+	cin >> sel;
+
+	if(sel == NORMAL){
+		OpenNormalAccount();
+	}else{
+		OpenCreditAccount();
+	}
+}
+
+void AccountControler::OpenNormalAccount(){
 	char id[ACC_LEN];
 	char name[NAME_LEN];
 	char fin_name[FIN_LEN];
 	int money;
+	int interrate;
 
 	cout << "+----------------------------------+" << endl;
-	cout << "|         Opne an Account          |" << endl;
+	cout << "|      Opne an Normal Account      |" << endl;
 	cout << "+----------------------------------+" << endl;
 	cout << "Account ID     : ";
 	cin >> id;
@@ -124,6 +178,8 @@ void AccountControler::OpenAccount(){
 	cin >> fin_name;
 	cout << "First Deposit Amount : ";
 	cin >> money; 
+	cout << "InterRate : ";
+	cin >> interrate;
 	cout << endl;
 
 	for(int i=0; i<ArrNum; ++i){
@@ -135,7 +191,58 @@ void AccountControler::OpenAccount(){
 		}
 	}
 	
-	AccArr[ArrNum++] = new Account(money, id, name, fin_name);
+	AccArr[ArrNum++] = new NormalAccount(money, id, name, fin_name, interrate);
+}
+
+void AccountControler::OpenCreditAccount(){
+	char id[ACC_LEN];
+	char name[NAME_LEN];
+	char fin_name[FIN_LEN];
+	int money;
+	int interrate;
+	int creditLevel;
+
+	cout << "+----------------------------------+" << endl;
+	cout << "|      Opne an Credit Account      |" << endl;
+	cout << "+----------------------------------+" << endl;
+	cout << "Account ID     : ";
+	cin >> id;
+	cout << "Account HOLDER	: ";
+	cin >> name;
+	cout << "Fin_ins NAME   : ";
+	cin >> fin_name;
+	cout << "First Deposit Amount : ";
+	cin >> money; 
+	cout << "InterRate : ";
+	cin >> interrate;
+	cout << "Credit Level(1toA,2toB,3toC): ";
+	cin >> creditLevel;
+	cout << endl;
+
+	for(int i=0; i<ArrNum; ++i){
+		if(!strcmp(AccArr[i]->GetAccId(), id)){
+			cout << "+----------------------------------+" << endl;
+			cout << "|  [Account ID is already exist!]  |" << endl;
+			cout << "+----------------------------------+" << endl << endl;
+			return;
+		}
+	}
+	
+	switch(creditLevel){
+		case 1:
+			AccArr[ArrNum++] = new HighCreditAccount(money, id, name, fin_name, interrate, LEVEL_A);
+			break;
+		case 2:
+			AccArr[ArrNum++] = new HighCreditAccount(money, id, name, fin_name, interrate, LEVEL_B);
+			break;
+		case 3:
+			AccArr[ArrNum++] = new HighCreditAccount(money, id, name, fin_name, interrate, LEVEL_C);
+			break;
+		default:
+			cout << "+----------------------------------+" << endl;
+			cout << "|       Wrong Credit Number!       |" << endl;
+			cout << "+----------------------------------+" << endl;
+	}
 }
 
 void AccountControler::DepositMoney(){
