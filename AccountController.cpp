@@ -40,9 +40,9 @@ void AccountControler::OpenAccount(){
 }
 
 void AccountControler::OpenNormalAccount(){
-	char id[ACC_LEN];
-	char name[NAME_LEN];
-	char fin_name[FIN_LEN];
+	char id[acc_len];
+	char name[name_len];
+	char fin_name[fin_len];
 	int money;
 	int interrate;
 
@@ -74,9 +74,9 @@ void AccountControler::OpenNormalAccount(){
 }
 
 void AccountControler::OpenCreditAccount(){
-	char id[ACC_LEN];
-	char name[NAME_LEN];
-	char fin_name[FIN_LEN];
+	char id[acc_len];
+	char name[name_len];
+	char fin_name[fin_len];
 	int money;
 	int interrate;
 	int creditLevel;
@@ -126,7 +126,7 @@ void AccountControler::OpenCreditAccount(){
 
 void AccountControler::DepositMoney(){
 	int money;
-	char id[ACC_LEN];
+	char id[acc_len];
 	
 	cout << "+----------------------------------+" << endl;
 	cout << "|             DEPOSIT              |" << endl;
@@ -159,7 +159,7 @@ void AccountControler::DepositMoney(){
 
 void AccountControler::WithdrawMoney(){
 	int money;
-	char id[ACC_LEN];
+	char id[acc_len];
 
 	cout << "+----------------------------------+" << endl;
 	cout << "|            WITHDRAW              |" << endl;

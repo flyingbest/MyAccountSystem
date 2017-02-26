@@ -5,9 +5,9 @@
 #include <cstring>		// Not using STL version.
 using namespace std;
 
-#define ACC_LEN 25
-#define NAME_LEN 20
-#define FIN_LEN 20
+const int acc_len = 25;
+const int name_len = 20;
+const int fin_len = 20;
 
 enum { OPEN=1, DEPOSIT, WITHDRAW, DISPLAY, EXIT };
 enum { LEVEL_A=5, LEVEL_B=3, LEVEL_C=2 };
